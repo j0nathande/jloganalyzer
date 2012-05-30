@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title>Logfile analyzer</title>
+  <link rel="alternate" href="https://url/to/jloganalyzer" />
+  <subtitle>This feed displays the last parser outputs.</subtitle>
+  <entry>
+    <title>Logfile 2</title>
+    <author>
+      <name />
+    </author>
+    <updated>2012-05-28T15:25:02Z</updated>
+    <published>2012-05-28T15:25:02Z</published>
+    <summary type="html">Number of logentries: 1, duration of analysis: 291, last analyzed timestamp: 1337525406180&lt;ol&gt;&lt;li&gt; LogEntry[thread: main, logger: org.jloganalyzer.LogGenerator, level: ERROR, timestamp: 1337525406180, message: Testentry for error test üöäqß with exception java.lang.Exception: testExcepion]&lt;/li&gt;&lt;/ol&gt;</summary>
+    <dc:date>2012-05-28T15:25:02Z</dc:date>
+  </entry>
+  <entry>
+    <title>Logfile 1</title>
+    <author>
+      <name />
+    </author>
+    <updated>2012-05-28T15:25:02Z</updated>
+    <published>2012-05-28T15:25:02Z</published>
+    <summary type="html">Number of logentries: 1, duration of analysis: 597, last analyzed timestamp: 2012-05-20 16:50:06,180&lt;ol&gt;&lt;li&gt; LogEntry[thread: main, logger: org.jloganalyzer.LogGenerator, level: ERROR, timestamp: 2012-05-20 16:50:06,180, message: Testentry for error test üöäqß with exception java.lang.Exception: testExcepion]&lt;/li&gt;&lt;/ol&gt;</summary>
+    <dc:date>2012-05-28T15:25:02Z</dc:date>
+  </entry>
+</feed>
+

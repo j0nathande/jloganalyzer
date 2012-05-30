@@ -1,0 +1,24 @@
+package org.jloganalyzer.service.impl;
+
+import javax.inject.Inject;
+
+import org.jloganalyzer.service.Analyzer;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("/applicationContext-test.xml")
+public class AnalyzerImplTest {
+	
+	@Inject
+	private Analyzer analyzer;
+	
+    @Test
+    public void test() {
+        analyzer.run();
+    }
+    
+}
