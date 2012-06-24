@@ -20,14 +20,12 @@ import org.slf4j.LoggerFactory;
  * @author Jonathan Strampp
  *
  */
-public class XmlParserImpl  implements LogParser {
+public class XmlParserImpl extends Log4jParser implements LogParser {
 
     private static Logger LOG = LoggerFactory.getLogger(XmlParserImpl.class);
     
-    private String level;
-    
     /** Pattern for entry begin */
-    private Pattern ENTRY_BEGIN_PATTERN;
+    private Pattern ENTRY_BEGIN_PATTERN = Pattern.compile("^<log4j:event logger=\"(.*?)\" timestamp=\"(\\d*?)\" level=\"(.*?)\" thread=\"(.*?)\">$");
     
     /** Pattern String for entry message end */
     private String ENTRY_MSG_END = "(\\Q]]></log4j:message>\\E)?";
@@ -36,69 +34,52 @@ public class XmlParserImpl  implements LogParser {
     private Pattern ENTRY_MSG_BEGIN_PATTERN = Pattern.compile("^\\Q<log4j:message><![CDATA[\\E(.*?)" + ENTRY_MSG_END + "$");
 
     public XmlParserImpl(String level) {
-        this.level = level;
-        ENTRY_BEGIN_PATTERN = Pattern.compile("^<log4j:event logger=\"(.*?)\" timestamp=\"(\\d*?)\" level=\""+ level +"\" thread=\"(.*?)\">$");
+        super.level = level;
     }
 
     @Override
     public ParseResult parse(File file, String timestamp) {
     	ParseResult parseResult = new ParseResult();
     	
-        Pattern patternFirstEvent = getFirstEventPattern(timestamp);
-        LOG.debug("parse file {} with pattern {}", file, patternFirstEvent);
+        LOG.debug("parse file {} with pattern {}", file, ENTRY_BEGIN_PATTERN);
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line;
-            String timestampOfLogentry = null;
-            boolean eventIsValidByTimestamp = false;
+            String timestampOfCheckedEvent = null;
+            
             while((line = br.readLine()) != null) {
-            	
-            	// matcher for first event by timestamp
-            	Matcher matcherFirstEvent = patternFirstEvent.matcher(line);
-            	
-                // matcher for regular event
+                // matcher for event
                 Matcher matcherEvent = ENTRY_BEGIN_PATTERN.matcher(line);
-            	
-            	// set last analyzed timestamp to new last timestamp
                 if (matcherEvent.matches()) {
-                	timestampOfLogentry = matcherEvent.group(2);
-                }
-                
-                if (matcherFirstEvent.matches()) {
-            		eventIsValidByTimestamp = true;
+                	
+                    timestampOfCheckedEvent = matcherEvent.group(2);
+                	String loglevelOfCheckedEvent = matcherEvent.group(3);
+                	
+                	if (isEventValidForTimestamp(timestamp, timestampOfCheckedEvent) 
+                			&& isEventValidForLoglevel(loglevelOfCheckedEvent)) {
+	            		// read next line:
+	                    line = br.readLine();
+	                    if (line != null) {
+	                    	// Message of event
+	                        Matcher matcherEventMessage = ENTRY_MSG_BEGIN_PATTERN.matcher(line);
+	                        
+	                        if (matcherEventMessage.matches()) {
+	                            LogEntry entry = new LogEntry(matcherEvent.group(4), matcherEvent.group(1), loglevelOfCheckedEvent, timestampOfCheckedEvent, matcherEventMessage.group(1));
+	                            parseResult.getEntries().add(entry);
+	                            LOG.debug("Match: " + entry);
+	                        }
+	                    }
+                	}
             	}
-            	
-                if (eventIsValidByTimestamp && matcherEvent.matches()) {
-            		// read next line:
-                    line = br.readLine();
-                    if (line != null) {
-                    	// Message of event
-                        Matcher matcherEventMessage = ENTRY_MSG_BEGIN_PATTERN.matcher(line);
-                        if (matcherEventMessage.matches()) {
-                            LogEntry entry = new LogEntry(matcherEvent.group(3), matcherEvent.group(1), level, timestampOfLogentry, matcherEventMessage.group(1));
-                            parseResult.getEntries().add(entry);
-                            LOG.debug("Match: " + entry);
-                        }
-                    }
-            	}
-            	parseResult.setLastTimestamp(timestamp);
             }
-        	parseResult.setLastTimestamp(timestampOfLogentry);
+        	parseResult.setLastTimestamp(timestampOfCheckedEvent);
         } catch (IOException e) {
-            e.printStackTrace();
+        	LOG.error("Exception parsing file.", e);
         }
         return parseResult;
     }
     
-    private Pattern getFirstEventPattern(String timestamp) {
-		if (timestamp == null) {
-			return ENTRY_BEGIN_PATTERN;
-		} else {
-			return Pattern.compile("^<log4j:event logger=\"(.*?)\" timestamp=\""+ timestamp +"\" level=\""+ level +"\" thread=\"(.*?)\">$");
-		}
-	}
-
-	public String toString() {
+    public String toString() {
         return "XmlParserImpl [Level: " + level + "]";
     }
 

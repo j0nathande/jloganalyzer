@@ -1,6 +1,6 @@
 package org.jloganalyzer.domain;
 
-import java.util.Map;
+import java.util.SortedMap;
 
 /**
  * This Bean is used to hold the statistics of each parsing of a file.
@@ -11,17 +11,17 @@ import java.util.Map;
 public class Statistics {
 	private String modelVersion;
 	private String lastTimestamp;
-	private Map<String, Data> results;
+	private SortedMap<String, Data> results;
 	public String getModelVersion() {
 		return modelVersion;
 	}
 	public void setModelVersion(String modelVersion) {
 		this.modelVersion = modelVersion;
 	}
-	public Map<String, Data> getResults() {
+	public SortedMap<String, Data> getResults() {
 		return results;
 	}
-	public void setResults(Map<String, Data> results) {
+	public void setResults(SortedMap<String, Data> results) {
 		this.results = results;
 	}
 	public String getLastTimestamp() {

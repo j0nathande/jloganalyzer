@@ -1,6 +1,7 @@
 package org.jloganalyzer.application;
 
 import java.io.IOException;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
@@ -11,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * Controller for serving json-statistics.
@@ -25,6 +28,12 @@ public class StatisticsServlet extends FileReaderServlet {
 	
 	@Inject
 	Analyzer analyzer;
+	
+	@RequestMapping(value = "/allStatistic/ids.json", produces="application/json")
+	public @ResponseBody Set<String> getAllStatisticIds() {
+		LOG.debug("getAllStatisticIds");
+		return analyzer.getId2FileAndParser().keySet();
+	}
 	
 	/**
 	 * Controller for writing the statistics in json-format to the response.

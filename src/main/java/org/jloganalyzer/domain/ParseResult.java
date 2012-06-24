@@ -15,6 +15,8 @@ public class ParseResult {
 	private Long duration;
 	private List <LogEntry> entries = new LinkedList<LogEntry>();
 	public String getLastTimestamp() {
+		// Sinces String 'null' is saved to json-file if value is null.
+		if ("null".equals(lastTimestamp)) return null;
 		return lastTimestamp;
 	}
 	public void setLastTimestamp(String lastTimestamp) {

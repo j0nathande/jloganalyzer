@@ -7,11 +7,8 @@
         http://www.springframework.org/schema/context 
         http://www.springframework.org/schema/context/spring-context-3.0.xsd">
  
- 	<!-- Load in application properties reference -->
-	<bean id="applicationProperties"
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location" value="classpath:application.properties" />
-	</bean>
+ 	<!-- application properties -->
+	<context:property-placeholder location="classpath:application.properties"/>
  
 	<!-- Scans the classpath for annotated components that will be auto-registered 
 		as Spring beans. -->

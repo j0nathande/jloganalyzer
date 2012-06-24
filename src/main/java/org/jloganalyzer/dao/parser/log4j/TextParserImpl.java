@@ -16,74 +16,54 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This parser is for log4j-ConversionPattern: %10d [%t] %-5p %c %x - %m%n
+ * Possible entry is: 2012-05-20 16:50:06,180 [main] ERROR org.jloganalyzer.LogGenerator  - Testentry for error test üöäqß with exception java.lang.Exception: testExcepion
  * 
  * @author Jonathan Strampp
  *
  */
-public class TextParserImpl  implements LogParser {
+public class TextParserImpl extends Log4jParser implements LogParser {
 
-private static Logger LOG = LoggerFactory.getLogger(TextParserImpl.class);
-    
-    private String level;
+	private static Logger LOG = LoggerFactory.getLogger(TextParserImpl.class);
     
     /** Pattern for entry begin */
-    private Pattern ENTRY_BEGIN_PATTERN;
+    private Pattern ENTRY_BEGIN_PATTERN = Pattern.compile("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3}) \\[(.*)\\] (\\w+)\\s* ([^ ]*)\\s+- (.*)$");
     
     public TextParserImpl(String level) {
         this.level = level;
-        ENTRY_BEGIN_PATTERN = Pattern.compile("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3}) \\[(.*)\\] " + level + "\\s+([^ ]*)\\s+- (.*)$");
     }
 
     @Override
     public ParseResult parse(File file, String timestamp) {
     	ParseResult parseResult = new ParseResult();
     	
-    	Pattern patternFirstEvent = getFirstEventPattern(timestamp);
-    	LOG.debug("parse file {} with pattern {}", file, patternFirstEvent);
+    	LOG.debug("Parse file {} with pattern {}", file, ENTRY_BEGIN_PATTERN);
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line;
-            String lastTimestamp = null;
-            boolean eventIsValidByTimestamp = false;
+            String timestampOfCheckedEvent = null;
+            
             while((line = br.readLine()) != null) {
-            	
-            	// matcher for regular event
-                Matcher matcherEvent = ENTRY_BEGIN_PATTERN.matcher(line);
-                
-                // matcher for first event by timestamp
-            	Matcher matcherFirstEvent = patternFirstEvent.matcher(line);
-                
-                // set last analyzed timestamp to new last timestamp
+            	// matcher for event
+            	Matcher matcherEvent = ENTRY_BEGIN_PATTERN.matcher(line);
                 if (matcherEvent.matches()) {
-                	lastTimestamp = matcherEvent.group(1);
-                }
-                
-                if (matcherFirstEvent.matches()) {
-            		eventIsValidByTimestamp = true;
-            	}
-                
-                if (eventIsValidByTimestamp && matcherEvent.matches()) {
-                    LogEntry entry = new LogEntry(matcherEvent.group(2), matcherEvent.group(3), level, lastTimestamp, matcherEvent.group(4));
-                    LOG.debug("Match: " + entry);
-                    parseResult.getEntries().add(entry);
+                	timestampOfCheckedEvent = matcherEvent.group(1);
+                	String loglevelOfCheckedEvent = matcherEvent.group(3);
+                	
+                	if (isEventValidForTimestamp(timestamp, timestampOfCheckedEvent) 
+                			&& isEventValidForLoglevel(loglevelOfCheckedEvent)) {
+	                    LogEntry entry = new LogEntry(matcherEvent.group(2), matcherEvent.group(4), loglevelOfCheckedEvent, timestampOfCheckedEvent, matcherEvent.group(5));
+	                    LOG.debug("Match: " + entry);
+	                    parseResult.getEntries().add(entry);
+                	}
                 }
             }
-        	parseResult.setLastTimestamp(lastTimestamp);
+        	parseResult.setLastTimestamp(timestampOfCheckedEvent);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("Exception parsing file.", e);
         }
         return parseResult;
     }
-    
-    
-    private Pattern getFirstEventPattern(String timestamp) {
-		if (timestamp == null) {
-			return ENTRY_BEGIN_PATTERN;
-		} else {
-			return Pattern.compile(timestamp + " \\[(.*)\\] " + level + "\\s+([^ ]*)\\s+- (.*)$");
-		}
-	}
-    
+
     
     public String toString() {
         return "TextParserImpl [Level: " + level + "]";

@@ -1,0 +1,45 @@
+<html>
+<head>
+<link type="application/atom+xml" rel="alternate" title="Last results"
+	href="lastresults/atom.xml" />
+
+<link class="include" rel="stylesheet" type="text/css"
+	href="css/jquery.jqplot.min.css" />
+
+<script src="js/jquery-1.7.2.min.js" type="text/javascript"></script>
+<script src="js/jquery.jqplot.min.js" type="text/javascript"></script>
+<script src="js/jqplot.dateAxisRenderer.min.js" type="text/javascript"></script>
+
+</head>
+<body>
+	<h2>Logfile analyzer</h2>
+	<a href="lastresults/atom.xml">atom feed</a>
+
+	<div id="charts"></div>
+
+	<script type="text/javascript">
+		$.getJSON('statistics/allStatistic/ids.json', function(data) {
+			$.each(data, function(index, name) {
+				var divId = "chartdiv"+index;
+				$("#charts").append("<div id='"+divId+"' style='height: 300px; width: 1000px;'></div>");
+				$.getJSON('statistics/' + name + '.json', function(data) {
+					var items = [];
+					$.each(data.results, function(key, val) {
+						var points = new Array();
+						points.push(key);
+						points.push(val.quantity);
+						items.push(points);
+					});
+					plotGraph(divId, name, items);
+				});
+			});
+		});
+		function plotGraph(divId, name, data) {
+			$.jqplot(divId, [data], {
+				title : name
+			});
+		}
+	</script>
+
+</body>
+</html>

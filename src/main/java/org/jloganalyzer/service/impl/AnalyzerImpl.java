@@ -74,6 +74,7 @@ public class AnalyzerImpl implements Analyzer {
 		Statistics statsOfFile = singleFileAndParserDao.getStatistics(id);
     	if (statsOfFile != null) {
     		lastTimestamp = statsOfFile.getLastTimestamp();
+    		if ("".equals(lastTimestamp)) return null;
     	}
     	return lastTimestamp;
 	}
