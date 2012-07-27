@@ -4,7 +4,7 @@ jloganalyzer
 What for?
 ------------
 
-This Java Webapplication which parses logfiles for messages with a given loglevel (e.g. ERROR). The results are displayed via html and atom-feed. 
+This Java Webapplication parses logfiles for messages with a given loglevel (e.g. ERROR). The results are displayed via html and atom-feed. 
 Currently log4j text files with ConversionPattern "%10d [%t] %-5p %c %x - %m%n" and log4j xml files are supported. But new ones can be implemented easyly.
 
 This Webapplication is intended to be used for development stage where applications are not monitored via professional tools. 
