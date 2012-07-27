@@ -9,7 +9,7 @@
 			http://www.springframework.org/schema/task/spring-task-3.0.xsd">
  
 	<task:scheduled-tasks scheduler="myScheduler">
-		<task:scheduled ref="analyzerBean" method="run" cron="1 * * * * ?" />
+		<task:scheduled ref="analyzerBean" method="run" cron="0 0 9,15 * * ?" />
 	</task:scheduled-tasks>
 
 	<task:scheduler id="myScheduler" pool-size="1" />

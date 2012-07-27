@@ -21,7 +21,7 @@
 		$.getJSON('statistics/allStatistic/ids.json', function(data) {
 			$.each(data, function(index, name) {
 				var divId = "chartdiv"+index;
-				$("#charts").append("<div id='"+divId+"' style='height: 300px; width: 1000px;'></div>");
+				$("#charts").append("<div id='"+divId+"' style='height: 300px; width: 1000px; margin-bottom:20px'></div>");
 				$.getJSON('statistics/' + name + '.json', function(data) {
 					var items = [];
 					$.each(data.results, function(key, val) {
@@ -36,7 +36,8 @@
 		});
 		function plotGraph(divId, name, data) {
 			$.jqplot(divId, [data], {
-				title : name
+				title: name,
+				axes: {xaxis: {renderer: $.jqplot.DateAxisRenderer}}
 			});
 		}
 	</script>
